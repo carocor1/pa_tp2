@@ -1,7 +1,4 @@
-import { IsDate, IsString, MinLength } from 'class-validator';
+import { PartialType } from '@nestjs/mapped-types';
+import { CreateMarcaDto } from './create-marca.dto';
 
-export class UpdateMarcaDto {
-  @MinLength(2)
-  @IsString()
-  denominacion?: string;
-}
+export class UpdateMarcaDto extends PartialType(CreateMarcaDto) {}
