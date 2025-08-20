@@ -1,4 +1,4 @@
-import { IsDate, IsString, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 export class CreateMarcaDto {
   @MinLength(2)
