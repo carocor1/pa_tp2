@@ -17,8 +17,18 @@ export class MarcaRepository implements IMarcaRepository {
     return await this.marcaRepository.save(marca);
   }
 
-  async findAll(): Promise<Marca[]> {
-    return await this.marcaRepository.find();
+  async findAllPaginated(page: number, limit: number) {
+    const [marcas, total] = await this.marcaRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+    });
+
+    return {
+      data: marcas,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit), //cant de paginas totales
+    };
   }
 
   async findOne(id: number): Promise<Marca | null> {

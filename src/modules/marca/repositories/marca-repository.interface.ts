@@ -4,7 +4,7 @@ import { Marca } from '../entities/marca.entity';
 
 export interface IMarcaRepository {
   create(createMarcaDto: CreateMarcaDto): Promise<Marca>;
-  findAll(): Promise<Marca[]>;
+  findAllPaginated(page: number, limit: number);
   findOne(id: number): Promise<Marca | null>;
   update(id: number, updateMarcaDto: UpdateMarcaDto): Promise<Marca | null>;
   softDelete(id: number): Promise<void>;

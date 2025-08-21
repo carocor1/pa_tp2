@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { MarcaService } from './marca.service';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
+import { PaginationMarcaDto } from './dto/pagination-marca.dto';
 
 @Controller('marca')
 export class MarcaController {
@@ -23,8 +25,8 @@ export class MarcaController {
   }
 
   @Get()
-  findAll(): Promise<Marca[]> {
-    return this.marcaService.findAll();
+  findAll(@Query() paginationDto: PaginationMarcaDto): Promise<Marca[]> {
+    return this.marcaService.findAll(paginationDto);
   }
 
   @Get(':id')

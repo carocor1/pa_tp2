@@ -3,6 +3,7 @@ import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
 import { IMarcaRepository } from './repositories/marca-repository.interface';
+import { PaginationMarcaDto } from './dto/pagination-marca.dto';
 
 @Injectable()
 export class MarcaService {
@@ -15,8 +16,9 @@ export class MarcaService {
     return await this.marcaRepository.create(createMarcaDto);
   }
 
-  async findAll(): Promise<Marca[]> {
-    return await this.marcaRepository.findAll();
+  async findAll(paginationMarcaDto: PaginationMarcaDto) {
+    const { limit = 5, page = 1 } = paginationMarcaDto;
+    return await this.marcaRepository.findAllPaginated(page, limit);
   }
 
   async findOne(id: number): Promise<Marca | null> {
