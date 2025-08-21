@@ -14,13 +14,16 @@ import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
 import { PaginationMarcaDto } from './dto/pagination-marca.dto';
+import { UppercaseDenominationPipe } from './pipes/uppercase-denomination.pipe';
 
 @Controller('marca')
 export class MarcaController {
   constructor(private readonly marcaService: MarcaService) {}
 
   @Post()
-  create(@Body() createMarcaDto: CreateMarcaDto): Promise<Marca> {
+  create(
+    @Body(UppercaseDenominationPipe) createMarcaDto: CreateMarcaDto,
+  ): Promise<Marca> {
     return this.marcaService.create(createMarcaDto);
   }
 
@@ -37,7 +40,7 @@ export class MarcaController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateMarcaDto: UpdateMarcaDto,
+    @Body(UppercaseDenominationPipe) updateMarcaDto: UpdateMarcaDto,
   ): Promise<Marca | null> {
     return this.marcaService.update(id, updateMarcaDto);
   }
