@@ -23,6 +23,8 @@ import {
   ApiQuery,
   ApiResponse,
 } from '@nestjs/swagger';
+import { ShowMarcaDto } from './dto/show-marca.dto';
+import { ShowPaginationMarcaDto } from './dto/show-pagination-marca.dto';
 
 @Controller('marca')
 export class MarcaController {
@@ -61,7 +63,7 @@ export class MarcaController {
   @Post()
   create(
     @Body(UppercaseDenominationPipe) createMarcaDto: CreateMarcaDto,
-  ): Promise<Marca> {
+  ): Promise<ShowMarcaDto> {
     return this.marcaService.create(createMarcaDto);
   }
 
@@ -106,7 +108,9 @@ export class MarcaController {
     },
   })
   @Get()
-  findAll(@Query() paginationDto: PaginationMarcaDto): Promise<Marca[]> {
+  findAll(
+    @Query() paginationDto: PaginationMarcaDto,
+  ): Promise<ShowPaginationMarcaDto> {
     return this.marcaService.findAll(paginationDto);
   }
 
@@ -134,7 +138,7 @@ export class MarcaController {
     },
   })
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Marca | null> {
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<ShowMarcaDto> {
     return this.marcaService.findOne(id);
   }
 
@@ -166,7 +170,7 @@ export class MarcaController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body(UppercaseDenominationPipe) updateMarcaDto: UpdateMarcaDto,
-  ): Promise<Marca | null> {
+  ): Promise<ShowMarcaDto> {
     return this.marcaService.update(id, updateMarcaDto);
   }
 

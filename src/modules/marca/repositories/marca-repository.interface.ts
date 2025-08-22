@@ -4,8 +4,16 @@ import { Marca } from '../entities/marca.entity';
 
 export interface IMarcaRepository {
   create(createMarcaDto: CreateMarcaDto): Promise<Marca>;
-  findAllPaginated(page: number, limit: number);
-  findOne(id: number): Promise<Marca | null>;
-  update(id: number, updateMarcaDto: UpdateMarcaDto): Promise<Marca | null>;
+  findAllPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{
+    marcas: Marca[];
+    total: number;
+    page: number;
+    lastPage: number;
+  }>;
+  findOne(id: number): Promise<Marca>;
+  update(id: number, updateMarcaDto: UpdateMarcaDto): Promise<Marca>;
   softDelete(id: number): Promise<void>;
 }

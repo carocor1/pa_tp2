@@ -17,32 +17,37 @@ export class MarcaRepository implements IMarcaRepository {
     return await this.marcaRepository.save(marca);
   }
 
-  async findAllPaginated(page: number, limit: number) {
+  async findAllPaginated(
+    page: number,
+    limit: number,
+  ): Promise<{
+    marcas: Marca[];
+    total: number;
+    page: number;
+    lastPage: number;
+  }> {
     const [marcas, total] = await this.marcaRepository.findAndCount({
       skip: (page - 1) * limit,
       take: limit,
     });
 
     return {
-      data: marcas,
+      marcas: marcas,
       total,
       page,
       lastPage: Math.ceil(total / limit), //cant de paginas totales
     };
   }
-
-  async findOne(id: number): Promise<Marca | null> {
+  //Ver qué sería más logico: si la excepción se envíe en el repository o en el service.
+  async findOne(id: number): Promise<Marca> {
     const marca = await this.marcaRepository.findOneBy({ id });
     if (!marca) {
       throw new NotFoundException('Marca no encontrada');
     }
     return marca;
   }
-
-  async update(
-    id: number,
-    updateMarcaDto: UpdateMarcaDto,
-  ): Promise<Marca | null> {
+  //Ver porque lo de encontrar si está capaz corresponde en el service.
+  async update(id: number, updateMarcaDto: UpdateMarcaDto): Promise<Marca> {
     await this.findOne(id);
     await this.marcaRepository.update(id, { ...updateMarcaDto });
     return await this.findOne(id);
