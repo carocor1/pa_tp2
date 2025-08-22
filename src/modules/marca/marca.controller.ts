@@ -13,7 +13,6 @@ import {
 import { MarcaService } from './marca.service';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
-import { Marca } from './entities/marca.entity';
 import { PaginationMarcaDto } from './dto/pagination-marca.dto';
 import { UppercaseDenominationPipe } from './pipes/uppercase-denomination.pipe';
 import {
@@ -31,34 +30,13 @@ export class MarcaController {
   constructor(private readonly marcaService: MarcaService) {}
 
   @ApiOperation({ summary: 'Crear una nueva marca' })
-  @ApiBody({
-    type: CreateMarcaDto,
-    examples: {
-      ejemplo: {
-        value: { denominacion: 'NIKE' },
-      },
-    },
-  })
+  @ApiBody({ type: CreateMarcaDto })
   @ApiResponse({
     status: 201,
-    description: 'Marca creada exitosamente.',
-    type: Marca,
+    type: ShowMarcaDto,
+    description: 'Marca creada.',
   })
-  @ApiResponse({
-    status: 400,
-    description:
-      'Datos inválidos. Ejemplo: denominación vacía o demasiado corta.',
-    schema: {
-      example: {
-        statusCode: 400,
-        message: [
-          'La denominación debe tener al menos 2 caracteres.',
-          'La denominación es obligatoria.',
-        ],
-        error: 'Bad Request',
-      },
-    },
-  })
+  @ApiResponse({ status: 400, description: 'Datos inválidos.' })
   @HttpCode(201)
   @Post()
   create(
@@ -68,44 +46,12 @@ export class MarcaController {
   }
 
   @ApiOperation({ summary: 'Listar marcas paginadas' })
-  @ApiQuery({
-    name: 'limit',
-    required: false,
-    type: Number,
-    example: 10,
-    description: 'Cantidad de marcas por página (default: 5)',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    type: Number,
-    example: 1,
-    description: 'Número de página (default: 1)',
-  })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiResponse({
     status: 200,
-    description: 'Listado paginado de marcas.',
-    schema: {
-      example: {
-        data: [
-          {
-            id: 1,
-            denominacion: 'NIKE',
-            createdAt: '2025-08-21T12:00:00.000Z',
-            updatedAt: '2025-08-21T12:00:00.000Z',
-          },
-          {
-            id: 2,
-            denominacion: 'ADIDAS',
-            createdAt: '2025-08-21T12:01:00.000Z',
-            updatedAt: '2025-08-21T12:01:00.000Z',
-          },
-        ],
-        total: 2,
-        page: 1,
-        lastPage: 1,
-      },
-    },
+    type: ShowPaginationMarcaDto,
+    description: 'Listado paginado.',
   })
   @Get()
   findAll(
@@ -115,57 +61,27 @@ export class MarcaController {
   }
 
   @ApiOperation({ summary: 'Obtener una marca por ID' })
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    example: 1,
-    description: 'ID de la marca',
-  })
+  @ApiParam({ name: 'id', type: Number })
   @ApiResponse({
     status: 200,
+    type: ShowMarcaDto,
     description: 'Marca encontrada.',
-    type: Marca,
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Marca no encontrada.',
-    schema: {
-      example: {
-        statusCode: 404,
-        message: 'Marca no encontrada',
-        error: 'Not Found',
-      },
-    },
-  })
+  @ApiResponse({ status: 404, description: 'Marca no encontrada.' })
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<ShowMarcaDto> {
     return this.marcaService.findOne(id);
   }
 
   @ApiOperation({ summary: 'Actualizar una marca por ID' })
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    example: 1,
-    description: 'ID de la marca',
-  })
-  @ApiBody({
-    type: UpdateMarcaDto,
-    examples: {
-      ejemplo: {
-        value: { denominacion: 'PUMA' },
-      },
-    },
-  })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiBody({ type: UpdateMarcaDto })
   @ApiResponse({
     status: 200,
-    description: 'Marca actualizada exitosamente.',
-    type: Marca,
+    type: ShowMarcaDto,
+    description: 'Marca actualizada.',
   })
-  @ApiResponse({
-    status: 404,
-    description: 'Marca no encontrada.',
-  })
+  @ApiResponse({ status: 404, description: 'Marca no encontrada.' })
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -174,31 +90,10 @@ export class MarcaController {
     return this.marcaService.update(id, updateMarcaDto);
   }
 
-  @ApiOperation({ summary: 'Eliminar (soft delete) una marca por ID' })
-  @ApiParam({
-    name: 'id',
-    type: Number,
-    example: 1,
-    description: 'ID de la marca',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Marca eliminada exitosamente.',
-    schema: {
-      example: null,
-    },
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Marca no encontrada.',
-    schema: {
-      example: {
-        statusCode: 404,
-        message: 'Marca no encontrada',
-        error: 'Not Found',
-      },
-    },
-  })
+  @ApiOperation({ summary: 'Eliminar una marca por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Marca eliminada.' })
+  @ApiResponse({ status: 404, description: 'Marca no encontrada.' })
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.marcaService.remove(id);
