@@ -1,4 +1,9 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMarcaDto } from './dto/create-marca.dto';
 import { UpdateMarcaDto } from './dto/update-marca.dto';
 import { Marca } from './entities/marca.entity';
@@ -16,6 +21,14 @@ export class MarcaService {
   ) {}
 
   async create(createMarcaDto: CreateMarcaDto): Promise<ShowMarcaDto> {
+    const exists = await this.alreadyExists(createMarcaDto.denominacion);
+    if (exists) {
+      throw new ConflictException(
+        "La marca con denominación '" +
+          createMarcaDto.denominacion +
+          "' ya existe.",
+      );
+    }
     return this.toResponseDto(
       await this.marcaRepository.create(createMarcaDto),
     );
@@ -40,20 +53,34 @@ export class MarcaService {
   }
 
   async findOne(id: number): Promise<ShowMarcaDto> {
-    return this.toResponseDto(await this.marcaRepository.findOne(id));
+    const marca = await this.marcaRepository.findOne(id);
+    if (!marca) {
+      throw new NotFoundException('Marca no encontrada');
+    }
+    return this.toResponseDto(marca);
   }
-
-  //DEUDA TÉCNICA: La excepción se lanza en el repositorio, pero se maneja aquí.
+  //VER POSIBLE DEUDA TÉCNICA
   async update(
     id: number,
     updateMarcaDto: UpdateMarcaDto,
   ): Promise<ShowMarcaDto> {
-    return this.toResponseDto(
-      await this.marcaRepository.update(id, updateMarcaDto),
-    );
+    await this.findOne(id);
+    if (updateMarcaDto.denominacion) {
+      const exists = await this.alreadyExists(updateMarcaDto.denominacion);
+      if (exists) {
+        throw new ConflictException(
+          "La marca con denominación '" +
+            updateMarcaDto.denominacion +
+            "' ya existe.",
+        );
+      }
+    }
+    await this.marcaRepository.update(id, updateMarcaDto);
+    return await this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
+    await this.findOne(id);
     await this.marcaRepository.softDelete(id);
   }
 
@@ -61,5 +88,12 @@ export class MarcaService {
     return plainToInstance(ShowMarcaDto, marca, {
       excludeExtraneousValues: true,
     });
+  }
+
+  async alreadyExists(denominacion: string): Promise<boolean> {
+    if (await this.marcaRepository.findByDenominacion(denominacion)) {
+      return true;
+    }
+    return false;
   }
 }

@@ -1,12 +1,10 @@
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { IMarcaRepository } from './marca-repository.interface';
 import { Marca } from '../entities/marca.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateMarcaDto } from '../dto/create-marca.dto';
-import { NotFoundException } from '@nestjs/common';
 import { UpdateMarcaDto } from '../dto/update-marca.dto';
 
-// Aplicar lógica de búsqueda de marca para verificar exitencia antes de crear.
 export class MarcaRepository implements IMarcaRepository {
   constructor(
     @InjectRepository(Marca) private marcaRepository: Repository<Marca>,
@@ -39,22 +37,22 @@ export class MarcaRepository implements IMarcaRepository {
     };
   }
   //Ver qué sería más logico: si la excepción se envíe en el repository o en el service.
-  async findOne(id: number): Promise<Marca> {
-    const marca = await this.marcaRepository.findOneBy({ id });
-    if (!marca) {
-      throw new NotFoundException('Marca no encontrada');
-    }
-    return marca;
+  async findOne(id: number): Promise<Marca | null> {
+    return await this.marcaRepository.findOneBy({ id });
   }
-  //Ver porque lo de encontrar si está capaz corresponde en el service.
-  async update(id: number, updateMarcaDto: UpdateMarcaDto): Promise<Marca> {
-    await this.findOne(id);
-    await this.marcaRepository.update(id, { ...updateMarcaDto });
-    return await this.findOne(id);
+  //Ver qué sería más logico: si la excepción se envíe en el repository o en el service.
+  async findByDenominacion(denominacion: string): Promise<Marca | null> {
+    return await this.marcaRepository.findOneBy({ denominacion });
+  }
+
+  async update(
+    id: number,
+    updateMarcaDto: UpdateMarcaDto,
+  ): Promise<UpdateResult> {
+    return await this.marcaRepository.update(id, { ...updateMarcaDto });
   }
 
   async softDelete(id: number): Promise<void> {
-    await this.findOne(id);
     await this.marcaRepository.softDelete(id);
   }
 }
